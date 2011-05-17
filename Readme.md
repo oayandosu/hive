@@ -11,9 +11,9 @@
 
   * List TBD
 
-## Node Compatibility
+## Compatibility
 
-Hive 2.x is compatible with node 0.4.x
+Hive is compatible with node 0.4.x
 
 ## License 
 
