@@ -1,0 +1,17 @@
+{
+  "name": "hive",
+  "description": "Rails inspired automation framework",
+  "version": "0.0.1",
+  "author": "Ritchie Martori",
+  "contributors": [ 
+    { "name": "Ritchie Martori", "email": "skawful@gmail.com" }
+  ],
+  "dependencies": {
+    "express": ">= 2 < 2.5.0",
+  },
+  "keywords": ["framework", "rails", "web", "rest", "restful"],
+  "repository": "git://github.com/ritch/hive",
+  "main": "index",
+  "bin": { "hive": "./bin/hive" },
+  "engines": { "node": ">= 0.4.1 < 0.5.0" }
+}
