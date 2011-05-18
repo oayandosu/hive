@@ -8,15 +8,3 @@ Feature: Fetching a file and saving it to a Database
 	    And I have opened foo.jpg
 	    When I save foo.jpg as a database model
 	    Then the testing database should contain the file
-	
-# Usage
-# var file = new hive.File('./assets/foo.jpg');
-# var model = new hive.Model();
-# file.proxy(model);
-# model.change(function(err, data, file) {
-#	if(err) throw err;
-#	if(data) {
-#		this.set({filename: file.name, data: data});
-#		this.save();
-#	}
-# });

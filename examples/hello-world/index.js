@@ -1,0 +1,1 @@
+require('../../lib/hive').init(__dirname);
