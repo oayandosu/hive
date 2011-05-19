@@ -1,11 +1,5 @@
-var app = hive.app;
-
-app.get('/', function(req,res) {
-	var person = new hive.models.Contact();
-	person.set({name: 'Joe'});
-	res.watch(person);
-	person.trigger('success');
-
+hive
+.at('/')
+.get('/', function(req,res) {
+	res.send('index');
 });
-
-app.listen(3000);
