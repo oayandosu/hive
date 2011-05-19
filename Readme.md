@@ -1,7 +1,6 @@
-
 # Hive 
 
-Automate your nodejs development.    
+Node development on autopilot.   
 
 *Version 0.0.1*
 
