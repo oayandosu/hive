@@ -1,0 +1,10 @@
+!!!
+%html
+  %head
+    %script{src:"/nowjs/now.js"}
+  %body
+    :javascript
+      now.csync = function(context, data) {
+        alert(data.msg);
+      }
+				

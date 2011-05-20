@@ -1,3 +1,4 @@
+/*
 hive
 .at('/tweets')
 //http://hello-world.dev/tweets/?limit=24
@@ -8,3 +9,4 @@ hive
 .post('/new', hive.models.tweet)
 //http://hello-world.dev/tweets/delete/:id
 .delete('/delete/:id', hive.models.tweet);
+*/
