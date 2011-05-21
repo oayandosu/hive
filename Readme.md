@@ -14,74 +14,59 @@ _note: v0.1 is in development, watch this repo and check back for 0.1 at the top
 
 ###Create
 
-	$ hive create hello-world at ~/projects on :80
+	$ hive new hello-world at ~/projects on :80
 	> Your project is running at http://hello-world.dev:80
 	
 ###Model
 
-Hive makes modeling data easy. Whether it is a database document, a file, a tweet, or any other piece of data.
+Hive makes modeling data easy. Whether it is in a database, an image, a tweet, or any other piece of data.
 
-	//Opening a file doesn't involve nested callbacks
+	//Opening a file is simple
 	var pic   = new hive.File('images/pic.jpg'),
-		model = new hive.Model({watch: pic});
-	//Tell the response what to care about, and it does the rest
+		model = new hive.Model({collection: 'files'});
+
+	//Hive helps us watch out for important events, so we don't have to think about them
+        //res (response) is smart enough to take it from here...
 	res.watch(model);
+
+	//All models (images, files, database items) support fetch
 	pic.fetch(function(err, data) {
-		pic.save(data);
+		//Take the contents of the file and save it to MongoDB
 		model.set({contents: data, file: pic.path});
 		model.save();
 	});
 
+	//Models can also sync, in real-time, on the server and the client
+	var notifications = new hive.Model({live: 'notifications'});
+	notifications.watch(pic);
 
-###Persist
-
-Hive supports several persistence layers out of the box.
-
-* Redis Cache
-* MongoDB
-
-###Authenticate
-
-Registration, remember me, forgot password, login? Yep.
-
-	var user = new hive.User('test@test.com', 'password');
-	res.watch(user);
-	user.save();
+	//Any browser client javascript can then bind to
+	hive.server.notifications //see above: live: 'notifications'
+	.bind('saw:progress', function() {
+		//Watch for the file specific progress event as a file is loading
+		console.log(e.data + '%');//25%
+	});
 
 ###Query
 
-Quickly model queries that automatically are cached.
+Quickly model queries to fetch multiple models at a time.
 
-	app.get('/latest', function(req,res) {
+	hive.get('/latest', function(req,res) {
+
 		//Find the latest 100 objects in the entire database
 		var query = new hive.Query({type: '*', sortby: 'created', asc: false, limit: 100});
+
 		//If views/latest.haml exists, the success or error will be sent to the view
 		res.watch(query);
-		//The result of this query will be cached
-		query.fetch();
-		if(query.isFromCache) {
-			setTimeout(function() {
-				//After 30 seconds, manually remove from cache
-				query.destroy();
-			}, 30000);
-		}
+
 	});
 
-Hive can also automatically create queries on the database server.
+##Routes
 
-	var ActiveUsersQuery = hive.Query.extend({
-		stored: function(result, db) {
-		   m = function() { emit(this.uid, 1); }
-		   r = function(k,vals) { return 1; }
-		   return db.events.mapReduce(m, r, { query : {type: 'login', limit: 25} });
-		}
-	});
+The above can also be written as a simple route.
 
-	app.get('/users/active', function(req,res) {
-		var users = new ActiveUsersQuery();
-		//Shorthand for res.watch()
-		res.watch(users.fetch());
-	});
+        //This will take care of query parameters, response type, instantiation, and just work.
+	hive.find('/latest/:id', hive.models.MyCustomQueryClass);
 
 
 ## Compatibility
