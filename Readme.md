@@ -26,7 +26,7 @@ Hive makes modeling data easy. Whether it is in a database, an image, a tweet, o
 		model = new hive.Model({collection: 'files'});
 
 	//Hive helps us watch out for important events, so we don't have to think about them
-        //res (response) is smart enough to take it from here...
+	//res (response) is smart enough to take it from here...
 	res.watch(model);
 
 	//All models (images, files, database items) support fetch
@@ -66,7 +66,7 @@ Quickly model queries to fetch multiple models at a time.
 The above can also be written as a simple route.
 
         //This will take care of query parameters, response type, instantiation, and just work.
-	hive.find('/latest/:id', hive.models.MyCustomQueryClass);
+	hive.find('/latest/:id', hive.queries.MyCustomQueryClass);
 
 
 ## Compatibility
