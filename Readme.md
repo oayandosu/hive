@@ -32,17 +32,16 @@ Node is mostly asynchronous. This can often causes headaches for simple operatio
 
 	//Suppose we normalize our cops into a model class
 	hive.model.Cop = hive.model.extend();
-	mobster.watch(hive.models.Cop);
 
-	//We can add a new watch method wherever we want, but the convention is to include this in the class definition.
-	mobster.prototype.saw.new = function(instance) {
-		if(instance instanceof hive.models.Cop) {
-			console.log('Coppers!! Cheeze it!')
-		}
+	//Hive lets you contextualize your watching so that your app doesn't get bogged down
+	mobster.watch(hive.models.Cop, {type: 'chief'});
+	
+	mobster.prototype.saw.new.Cop = function(instance) {
+		console.log('Coppers!! Cheeze it!');
 	}
 
 	//This will automatically emit the 'new' event and call saw.new() on the watcher
-	var wiggum = new hive.Cop();
+	var wiggum = new hive.Cop({type: 'chief'});
 
 Result
 
