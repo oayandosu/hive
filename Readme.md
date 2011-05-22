@@ -19,7 +19,7 @@ Node is mostly asynchronous. This can often causes headaches for simple operatio
 	//Tell an object to pay attention to something else
 	var cop = new hive.Model({
 		saw: {
-				robbery: function(robber) {
+			robbery: function(robber) {
 				console.log("Cuff 'em boys...");
 			}
 		}
