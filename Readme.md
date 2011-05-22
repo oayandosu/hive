@@ -12,6 +12,43 @@ Node development on autopilot.
 
 _note: v0.1 is in development, watch this repo and check back for 0.1 at the top_
 
+###Watch
+
+Node is mostly asynchronous. This can often causes headaches for simple operations. Hive simplifies this with watchers.
+
+	//Tell an object to pay attention to something else
+	var cop = new hive.Model({
+		saw: {
+				robbery: function(robber) {
+				console.log("Cuff 'em boys...");
+			}
+		}
+	});
+
+	//Create and watch
+	var mobster = new hive.Model();
+	cop.watch(mobster);
+	mobster.robbery();
+
+	//Suppose we normalize our cops into a model class
+	hive.model.Cop = hive.model.extend();
+	mobster.watch(hive.models.Robbers);
+
+	//We can add a new watch method wherever we want, but the convention is to include this in the class definition.
+	mobster.prototype.saw.new = function(instance) {
+		if(instance instanceof hive.models.Cop) {
+			console.log('Coppers!! Cheeze it!')
+		}
+	}
+
+	//This will automatically emit the 'new' event and call saw.new() on the watcher
+	var wiggum = new hive.Cop();
+
+Result
+
+  > Cuff 'em boys...
+  > Coppers!! Cheeze it!
+
 ###Create
 
 	$ hive create hello-world at ~/projects on :80
