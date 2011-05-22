@@ -32,7 +32,7 @@ Node is mostly asynchronous. This can often causes headaches for simple operatio
 
 	//Suppose we normalize our cops into a model class
 	hive.model.Cop = hive.model.extend();
-	mobster.watch(hive.models.Robbers);
+	mobster.watch(hive.models.Cop);
 
 	//We can add a new watch method wherever we want, but the convention is to include this in the class definition.
 	mobster.prototype.saw.new = function(instance) {
