@@ -41,6 +41,8 @@ Node is mostly asynchronous. This can often causes headaches for simple operatio
 	}
 
 	//This will automatically emit the 'new' event and call saw.new() on the watcher
+	//This makes it possible to create complex event handling on thousands of instances
+	//without any extra code. Think: Facebook News Feed (example video coming soon)
 	var wiggum = new hive.Cop({type: 'chief'});
 
 Result
@@ -50,8 +52,8 @@ Result
 
 ###Create
 
-	$ hive new hello-world at ~/projects on :80
-	> Your project is running at http://hello-world.dev:80
+	$ hive new hello-world
+	> Your project is running at http://hello-world.dev
 	
 ###Model
 

@@ -1,3 +1,80 @@
-/*
- * TODO - project builder CLI
- */
+#!/usr/bin/env node
+
+require('../lib/util/cli');
+require('../index');
+
+var _ = require('underscore');
+
+//Default options
+var options = {};
+
+//Map functionality to args
+var commands = {
+	new: function(args) {
+		if(options.argument) {
+			if(!args.model) {
+				project(options.argument);
+			}
+		}
+	},
+	model: function(args) {
+		
+	},
+	design: function(args) {
+		
+	},
+	done: function(args) {
+		
+	},
+	y: function(args) {
+		
+	},
+	n: function(args) {
+		
+	}
+}
+var allCommands = _.keys(commands);
+
+function loop(inputs) {
+
+	//Find the non command argument (usually the name of the new object)
+	inputs.forEach(function(command) {
+		if(!_.contains(allCommands, command)) {
+			options.argument = command;
+		}
+	});
+	
+	//Run all the commands
+	inputs.forEach(function(command) {
+		if(_.contains(allCommands, command)) {
+			commands[command](inputs);
+		}
+	});	
+	
+}
+
+function model(inputs) {
+	
+}
+
+function project(name) {
+	
+	//Create in cd
+	var cd = process.env.PWD;
+	var root = new hive.Dir({path: cd});
+	root.save();
+	
+	//Paste in the templates
+	var templates = new hive.Dir({path: './templates/basic'});
+	templates.paste(root, name);
+	
+	//Get every file in the new root
+	root.find(function(file) {
+		file.save({
+			data: file.get('data').replace('[[[PROJECT_NAME]]]', name)
+	 	});
+	 });
+	
+}
+
+loop(process.argv);
