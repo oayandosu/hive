@@ -11,9 +11,9 @@ var options = {};
 //Map functionality to args
 var commands = {
 	new: function(args) {
-		if(options.argument) {
+		if(options.name) {
 			if(!args.model) {
-				project(options.argument);
+				project(options.name);
 			}
 		}
 	},
@@ -40,7 +40,7 @@ function loop(inputs) {
 	//Find the non command argument (usually the name of the new object)
 	inputs.forEach(function(command) {
 		if(!_.contains(allCommands, command)) {
-			options.argument = command;
+			options.name = command;
 		}
 	});
 	
@@ -66,15 +66,37 @@ function project(name) {
 	
 	//Paste in the templates
 	var templates = new hive.Dir({path: './templates/basic'});
-	templates.paste(root, name);
-	
+	var copy = templates.paste(root, name);
+
+	var extensions = ['.js', '.haml', '.ejs', '.css'];
+
 	//Get every file in the new root
 	root.find(function(file) {
-		file.save({
-			data: file.get('data').replace('[[[PROJECT_NAME]]]', name)
-	 	});
+		if(extensions.indexOf(file.ext()) > -1) {
+			file.fetch();
+			file.bind('change', function() {
+				var old = file.get('data');
+				if(old) {
+					file.save({
+						data: template(old)
+				 	});
+				}
+			});	
+		}
 	 });
+
 	
 }
+
+function template(data) {
+	var str = data.toString();
+	for(var o in options) {
+		var key = '[%=]'+ o +'[/%]';
+		str = str.replace(key, options[o]);
+	}
+	console.log(str);
+	return str;
+}
+
 
 loop(process.argv);
