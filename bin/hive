@@ -84,6 +84,16 @@ function project(name) {
 			});	
 		}
 	 });
+	
+	root.find(extensions, function(file) {
+		file.update(function(data) {
+			return template(data);
+		})
+	});
+	
+	root.find(extensions, {update: function(data) {
+		return template(data);
+	});
 
 	
 }
