@@ -64,38 +64,23 @@ function project(name) {
 	var root = new hive.Dir({path: cd});
 	root.save();
 	
-	//Paste in the templates
-	var templates = new hive.Dir({path: './templates/basic'});
+	// paste in the templates
+	var templates = new hive.Dir({path: __dirname + '/templates/basic'});
 	var copy = templates.paste(root, name);
-
-	var extensions = ['.js', '.haml', '.ejs', '.css'];
-
-	//Get every file in the new root
-	root.find(function(file) {
-		if(extensions.indexOf(file.ext()) > -1) {
-			file.fetch();
-			file.bind('change', function() {
-				var old = file.get('data');
-				if(old) {
-					file.save({
-						data: template(old)
-				 	});
-				}
-			});	
-		}
-	 });
-	
-	root.find(extensions, function(file) {
-		file.update(function(data) {
-			return template(data);
-		})
-	});
-	
-	root.find(extensions, {update: function(data) {
-		return template(data);
+	copy.bind('pasted', function() {
+		
+		var extensions = ['.js', '.haml', '.ejs', '.css'];
+		
+		// get every file in the new root
+		root.find(function(file) {
+			if(extensions.indexOf(file.ext()) > -1) {
+				file.update(function(data) {
+					return template(data);
+				});
+			}
+		 });
 	});
 
-	
 }
 
 function template(data) {
@@ -104,7 +89,7 @@ function template(data) {
 		var key = '[%=]'+ o +'[/%]';
 		str = str.replace(key, options[o]);
 	}
-	console.log(str);
+	console.log('\r\nWRITING TEMPLATE\r\n');
 	return str;
 }
 
