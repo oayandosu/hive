@@ -12,7 +12,8 @@
         "express":">= 2.0.0",
 		"backbone":">= 0.3.0",
 		"mongoose":">= 1.0.0",
-		"findit": ">= 0.0.3"
+		"findit": ">= 0.0.3",
+		"rimraf": ">= 0.0.1"
     },
     "keywords":["framework",
         "web",

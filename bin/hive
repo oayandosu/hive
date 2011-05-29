@@ -86,7 +86,7 @@ function project(name) {
 function template(data) {
 	var str = data.toString();
 	for(var o in options) {
-		var key = '[%=]'+ o +'[/%]';
+		var key = '[%= '+ o +' %]';
 		str = str.replace(key, options[o]);
 	}
 	console.log('\r\nWRITING TEMPLATE\r\n');
