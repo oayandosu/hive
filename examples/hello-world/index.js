@@ -1,1 +1,2 @@
-require('../../lib/hive').init(__dirname);
+GLOBAL.hive = require('../../lib/hive');
+hive.init(__dirname);
