@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 require('../lib/util/cli');
-require('../index');
+var hive = require('../index');
 
 var _ = require('underscore');
 
