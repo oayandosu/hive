@@ -89,7 +89,7 @@ function template(data) {
 		var key = '[%= '+ o +' %]';
 		str = str.replace(key, options[o]);
 	}
-	console.log('\r\nWRITING TEMPLATE\r\n');
+	hive.log('\r\nWRITING TEMPLATE\r\n');
 	return str;
 }
 

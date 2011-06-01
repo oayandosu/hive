@@ -29,7 +29,7 @@ vows.describe('file').addBatch({
 							setTimeout(function() {
 								_self.callback(null, stat.isDirectory());
 							}, 500);
-						}l
+						}
 					});
 				});
 				

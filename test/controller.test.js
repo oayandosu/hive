@@ -30,7 +30,7 @@ vows.describe('controller').addBatch({
 			}
 		},
 		'has a simple get route': routeMacro(),
-		'has a simple post route': routeMacro({method: 'post'})
+		'has a simple post route': routeMacro({method: 'post', path: '/post'})
     }
 }).export(module);
 
@@ -50,7 +50,9 @@ function routeMacro(opt) {
 			});
 			var _self = this,
 				path = (opt.path === '/') ? '' : opt.path,
-				test = new hive.Http({url: 'http://localhost:3000' + opt.at + path});
+				url = 'http://localhost:3000' + opt.at + path,
+				test = new hive.Http({url: url});
+			hive.log(url, '*******');
 			test.bind('success', function() {
 				_self.callback(null, test);
 			});
