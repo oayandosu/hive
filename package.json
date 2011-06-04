@@ -14,13 +14,10 @@
 		"mongoose":">= 1.0.0",
 		"findit": ">= 0.0.3",
 		"rimraf": ">= 0.0.1",
-		"request": ">= 1.0.0"
+		"request": ">= 1.0.0",
+		"formidable": ">= 0.9.9"
     },
-    "keywords":["framework",
-        "web",
-        "redis",
-        "mongodb"
-    ],
+    "keywords":["framework"],
     "repository":"git://github.com/ritch/hive",
     "main":"index",
     "bin":{
