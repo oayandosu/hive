@@ -4,6 +4,9 @@ var vows     = require('vows'),
     assert	 = require('assert'),
 	_		 = require('underscore');
 
+// hide debug
+hive.config.debug = false;
+
 // directory behavior
 vows.describe('controller').addBatch({
 	

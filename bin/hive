@@ -74,9 +74,9 @@ function project(name) {
 		// get every file in the new root
 		root.find(function(file) {
 			if(extensions.indexOf(file.ext()) > -1) {
-				file.update(function(data) {
-					return template(data);
-				});
+				// file.update(function(data) {
+				// 				return template(data);
+				// 			});
 			}
 		 });
 	});
