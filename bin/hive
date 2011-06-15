@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 require('../lib/util/cli');
-var hive = require('../index');
 
+var hive = require('../index');
+var inflection = require('../lib/util/inflection');
 var _ = require('underscore');
 
 //Default options
@@ -11,14 +12,10 @@ var options = {};
 //Map functionality to args
 var commands = {
 	new: function(args) {
-		if(options.name) {
-			if(!args.model) {
-				project(options.name);
-			}
-		}
+		options.name && project(options.name);
 	},
 	model: function(args) {
-		
+		options.name && model(options.name); //args[1] is the path
 	},
 	design: function(args) {
 		
@@ -53,8 +50,43 @@ function loop(inputs) {
 	
 }
 
-function model(inputs) {
+function model(name) {
+	console.log(name);
+	var singular = name;
+	var plural = inflection.pluralize(name);
 	
+	var context = {
+		name: name
+	};
+	
+	var cd = process.env.PWD;
+	
+	var modelTemplate = new hive.File({path: __dirname + '/templates/Model.js'});
+	var queryTemplate = new hive.File({path: __dirname + '/templates/Query.js'});
+	var controllerTemplate = new hive.File({path: __dirname + '/templates/Controller.js'});
+	var indexTemplate = new hive.File({path: __dirname + '/templates/index.haml'});
+	var allTemplate = new hive.File({path: __dirname + '/templates/all.haml'});
+	var newTemplate = new hive.File({path: __dirname + '/templates/new.haml'});
+	
+	var root = new hive.Dir({path: cd});
+	var model = new hive.File({path: cd + '/models/' + singular + '.js'});
+	var query = new hive.File({path: cd + '/queries/' + plural + '.js'});
+	var controller = new hive.File({path: cd + '/controllers/' + singular.toLowerCase() + '.js'});
+	template(model, context, modelTemplate);
+	template(query, context, queryTemplate);
+	template(controller, context, controllerTemplate);
+	
+	var viewFolder = singular.toLowerCase();
+	var views = new hive.Dir({path: cd + '/views/' + viewFolder});
+	views.once('success', function() {
+		var index = new hive.File({path: cd + '/views/' + viewFolder + '/index.haml'});
+		var all = new hive.File({path: cd + '/views/' + viewFolder + '/all.haml'});
+		var _new = new hive.File({path: cd + '/views/' + viewFolder + '/new.haml'});
+		template(index, context, indexTemplate);
+		template(all, context, allTemplate);
+		template(_new, context, newTemplate);
+	});
+	views.save();
 }
 
 function project(name) {
@@ -69,28 +101,47 @@ function project(name) {
 	var copy = templates.paste(root, name);
 	copy.bind('pasted', function() {
 		
-		var extensions = ['.js', '.haml', '.ejs', '.css'];
+		var extensions = ['.js', '.haml', '.ejs', '.css', '.json'];
 		
 		// get every file in the new root
 		root.find(function(file) {
 			if(extensions.indexOf(file.ext()) > -1) {
-				// file.update(function(data) {
-				// 				return template(data);
-				// 			});
+				template(file, options);
 			}
 		 });
 	});
 
 }
 
-function template(data) {
-	var str = data.toString();
-	for(var o in options) {
-		var key = '[%= '+ o +' %]';
-		str = str.replace(key, options[o]);
+_.templateSettings = {
+   evaluate    : /\[%([\s\S]+?)%]/g,
+   interpolate : /\[%=([\s\S]+?)%]/g
+ };
+
+function template(file, context, template) {
+	function render(str) {
+		var result;
+		hive.log('\r\nWRITING TEMPLATE\r\n');
+		try {
+			result = _.template(str, context);
+		} catch(e) { }
+
+		return result || str;
 	}
-	hive.log('\r\nWRITING TEMPLATE\r\n');
-	return str;
+	if(template) {
+		console.log('*********');
+		template.once('change', function() {
+			file.update(function(data) {
+				console.log('TEMPLATE!!!!!!!!!', template);
+				return render(template.get('data'));
+			});
+		});
+		template.fetch();
+	} else {
+		file.update(function(data) {
+			return render(data.toString());
+		});
+	}
 }
 
 
