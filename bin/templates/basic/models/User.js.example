@@ -1,0 +1,44 @@
+var hive = require('hive');
+
+exports = module.exports = hive.Model.extend({
+	_name: 'user',
+	activity: [],
+	following: [],
+	did: function(method, action, type, id) {
+    	var activity = {type: type, at: new Date().getTime(), id: id};
+		activity[method] = action;
+		this.push({activity: activity});
+	},
+	follow: function(user) {
+		this.push({following: user})
+	},
+	validate: function() {
+		var assert = this.assert;
+		return this.describe({
+			'email': {
+				'you must enter a valid email address': function(email) {
+					assert.email(email);
+				}
+			},
+			'password': {
+				'you must enter a password': function(password) {
+					assert.exists(password);
+				},
+				'a password must be atleast 4 characters': function(password) {
+					if(password) {
+						assert.true(password.length >= 4);
+					}
+				}
+			},
+			'name': {
+				'a name is required': function(name) {
+					assert.exists(name);
+				},
+				'a name can only be 256 chars in length': function(name) {
+					assert.true(name.length < 256);
+				}
+			}
+		});
+		
+	}
+});
