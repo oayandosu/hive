@@ -1,1 +1,6 @@
-This is the [%= name %] all view.
+%h1 All [%= inflection.pluralize(name) %]
+- if (results)
+  %ul
+    - each item in results
+      - item = item.toJSON()
+      %li= JSON.stringify(item)

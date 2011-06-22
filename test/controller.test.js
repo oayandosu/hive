@@ -1,41 +1,13 @@
 var vows     = require('vows'),
-	hive     = require('../index'),
-	fs 	     = require('fs'),
+	hive     = require('../lib/hive'),
+	fs		 = require('fs'),
     assert	 = require('assert'),
+	controller = require('../lib/controller'),
 	_		 = require('underscore');
 
 // hide debug
 hive.config.debug = false;
 
-// directory behavior
-vows.describe('controller').addBatch({
-	
-    'When a new controller': {
-        topic: hive.at('/test'),
-
-		'has a base route': {
-			topic: function(controller) {
-				controller.get('/', function(req, res) {
-					res.send('ok');
-				});
-				hive.app.listen(3000);
-				var _self = this,
-					test = new hive.Http({url: 'http://localhost:3000/test'});
-				test.bind('success', function() {
-					_self.callback(null, test);
-				});
-				test.fetch();
-			},
-			'it should respond to a GET request at that route': function(err, test) {
-				assert.equal(test.res.statusCode, 200);
-				assert.equal(test.get('data'), 'ok');
-				//hive.app.close();
-			}
-		},
-		'has a simple get route': routeMacro(),
-		'has a simple post route': routeMacro({method: 'post', path: '/post'})
-    }
-}).export(module);
 
 // macro for route tests
 function routeMacro(opt) {
@@ -76,7 +48,37 @@ function routeMacro(opt) {
 	};
 	result['it should respond to a ' + opt.method] = function(err, model) {
 		assert.equal(model.res.statusCode, 200);
-	}
+	};
 	return result;
 		
 }
+
+
+// directory behavior
+vows.describe('controller').addBatch({
+	
+    'When a new controller': {
+        topic: hive.at('/test'),
+		'has a base route': {
+			topic: function(controller) {
+				controller.get('/', function(req, res) {
+					res.send('ok');
+				});
+				hive.app.listen(3000);
+				var _self = this,
+					test = new hive.Http({url: 'http://localhost:3000/test'});
+				test.bind('success', function() {
+					_self.callback(null, test);
+				});
+				test.fetch();
+			},
+			'it should respond to a GET request at that route': function(err, test) {
+				assert.equal(test.res.statusCode, 200);
+				assert.equal(test.get('data'), 'ok');
+				//hive.app.close();
+			}
+		},
+		'has a simple get route': routeMacro(),
+		'has a simple post route': routeMacro({method: 'post', path: '/post'})
+    }
+}).export(module);

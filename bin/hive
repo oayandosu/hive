@@ -2,56 +2,52 @@
 
 require('../lib/util/cli');
 
-var hive = require('../index');
-var inflection = require('../lib/util/inflection');
-var _ = require('underscore');
+var hive = require('../index'),
+	_ = require('underscore'),
+	options = {},
+	hiveART = ''        +
+ ' _   _         \r\n'  +
+ '| |_|_|_ _ ___ \r\n'  +
+ '|   | | | | -_|\r\n'  +
+ '|_|_|_|\\_/|___|\r\n' +
+ '\r\n';
 
-//Default options
-var options = {};
+GLOBAL.inflection	= require('../lib/util/inflection');
 
-//Map functionality to args
-var commands = {
-	new: function(args) {
-		options.name && project(options.name);
-	},
-	model: function(args) {
-		options.name && model(options.name); //args[1] is the path
-	},
-	design: function(args) {
-		
-	},
-	done: function(args) {
-		
-	},
-	y: function(args) {
-		
-	},
-	n: function(args) {
-		
+// hide logs
+hive.config.debug = false;
+
+// custom template settings
+_.templateSettings = {
+   evaluate    : /\[%([\s\S]+?)%\]/g,
+   interpolate : /\[%=([\s\S]+?)%\]/g
+};
+
+function genTemplate(file, context, template) {
+	function render(str) {
+		var result;
+		try {
+			result = _.template(str, context);
+		} catch(e) { }
+
+		return result || str;
+	}
+	if(template) {
+		template.once('change', function() {
+			file.update(function(data) {
+				return render(template.get('data'));
+			});
+		});
+		template.fetch();
+	} else {
+		file.update(function(data) {
+			return render(data.toString());
+		});
 	}
 }
-var allCommands = _.keys(commands);
 
-function loop(inputs) {
-
-	//Find the non command argument (usually the name of the new object)
-	inputs.forEach(function(command) {
-		if(!_.contains(allCommands, command)) {
-			options.name = command;
-		}
-	});
+function genModel(name) {
 	
-	//Run all the commands
-	inputs.forEach(function(command) {
-		if(_.contains(allCommands, command)) {
-			commands[command](inputs);
-		}
-	});	
-	
-}
-
-function model(name) {
-	console.log(name);
 	var singular = name;
 	var plural = inflection.pluralize(name);
 	
@@ -72,9 +68,9 @@ function model(name) {
 	var model = new hive.File({path: cd + '/models/' + singular + '.js'});
 	var query = new hive.File({path: cd + '/queries/' + plural + '.js'});
 	var controller = new hive.File({path: cd + '/controllers/' + singular.toLowerCase() + '.js'});
-	template(model, context, modelTemplate);
-	template(query, context, queryTemplate);
-	template(controller, context, controllerTemplate);
+	genTemplate(model, context, modelTemplate);
+	genTemplate(query, context, queryTemplate);
+	genTemplate(controller, context, controllerTemplate);
 	
 	var viewFolder = singular.toLowerCase();
 	var views = new hive.Dir({path: cd + '/views/' + viewFolder});
@@ -82,9 +78,9 @@ function model(name) {
 		var index = new hive.File({path: cd + '/views/' + viewFolder + '/index.haml'});
 		var all = new hive.File({path: cd + '/views/' + viewFolder + '/all.haml'});
 		var _new = new hive.File({path: cd + '/views/' + viewFolder + '/new.haml'});
-		template(index, context, indexTemplate);
-		template(all, context, allTemplate);
-		template(_new, context, newTemplate);
+		genTemplate(index, context, indexTemplate);
+		genTemplate(all, context, allTemplate);
+		genTemplate(_new, context, newTemplate);
 	});
 	views.save();
 }
@@ -106,43 +102,74 @@ function project(name) {
 		// get every file in the new root
 		root.find(function(file) {
 			if(extensions.indexOf(file.ext()) > -1) {
-				template(file, options);
+				genTemplate(file, options);
 			}
 		 });
 	});
 
 }
 
-_.templateSettings = {
-   evaluate    : /\[%([\s\S]+?)%]/g,
-   interpolate : /\[%=([\s\S]+?)%]/g
- };
-
-function template(file, context, template) {
-	function render(str) {
-		var result;
-		hive.log('\r\nWRITING TEMPLATE\r\n');
-		try {
-			result = _.template(str, context);
-		} catch(e) { }
-
-		return result || str;
+//Map functionality to args
+var commands = {
+	new: function(args) {
+		cli
+		.clear()
+		.color('cyan')
+		.write(hiveART)
+		.color('white');
+		if(options.name) {
+			project(options.name);
+			cli.color('white')
+			.write('creating ')
+			.color('green', true)
+			.write(options.name)
+			.color('white')
+			.write(' @ ' + process.env.PWD + '/' + options.name + '\n\n');
+		}
+	},
+	model: function(args) {
+		if(options.name) {
+			genModel(options.name);
+			cli.color('white')
+			.write('\ngenerating ')
+			.color('green')
+			.write(options.name)
+			.color('white')
+			.write(' model, views, and controller\n\n');
+		}
+	},
+	design: function(args) {
+		
+	},
+	done: function(args) {
+		
+	},
+	y: function(args) {
+		
+	},
+	n: function(args) {
+		
 	}
-	if(template) {
-		console.log('*********');
-		template.once('change', function() {
-			file.update(function(data) {
-				console.log('TEMPLATE!!!!!!!!!', template);
-				return render(template.get('data'));
-			});
-		});
-		template.fetch();
-	} else {
-		file.update(function(data) {
-			return render(data.toString());
-		});
-	}
+};
+
+function loop(inputs) {
+
+	var allCommands = _.keys(commands);
+	
+	//Find the non command argument (usually the name of the new object)
+	inputs.forEach(function(command) {
+		if(!_.contains(allCommands, command)) {
+			options.name = command;
+		}
+	});
+	
+	//Run all the commands
+	inputs.forEach(function(command) {
+		if(_.contains(allCommands, command)) {
+			commands[command](inputs);
+		}
+	});	
+	
 }
-
 
 loop(process.argv);
