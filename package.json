@@ -1,7 +1,7 @@
 {
     "name":"hive",
     "description":"Intuitive development framework for all sorts of types of node apps",
-    "version":"0.0.1",
+    "version":"0.1.0",
     "author":"Ritchie Martori",
     "contributors":[{
             "name":"Ritchie Martori",
