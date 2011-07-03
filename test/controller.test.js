@@ -8,7 +8,6 @@ var vows     = require('vows'),
 // hide debug
 hive.config.debug = false;
 
-
 // macro for route tests
 function routeMacro(opt) {
 	var def = {
@@ -53,8 +52,7 @@ function routeMacro(opt) {
 		
 }
 
-
-// directory behavior
+// controller behavior
 vows.describe('controller').addBatch({
 	
     'When a new controller': {
@@ -81,4 +79,5 @@ vows.describe('controller').addBatch({
 		'has a simple get route': routeMacro(),
 		'has a simple post route': routeMacro({method: 'post', path: '/post'})
     }
+
 }).export(module);

@@ -5,6 +5,7 @@ require('../lib/util/cli');
 var hive = require('../index'),
 	_ = require('underscore'),
 	options = {},
+	spawn = require('child_process').spawn,
 	hiveART = ''        +
  ' _   _         \r\n'  +
  '| |_|_|_ _ ___ \r\n'  +
@@ -138,21 +139,31 @@ var commands = {
 			.write(' model, views, and controller\n\n');
 		}
 	},
-	design: function(args) {
-		
-	},
-	done: function(args) {
-		
-	},
-	y: function(args) {
-		
-	},
-	n: function(args) {
+	preview: function () {
 		
 	}
 };
 
+var child;
+function boot() {
+	child = spawn('node', ['index.js']);
+	child.stdout.pipe(process.stdout, { end: false });
+	child.on('exit', function (code, signal) {
+		if(signal < 4) {
+			console.log('Hive server shutdown with:', {code: code, signal: signal});
+			process.kill(signal);
+		} else {
+			process.nextTick(boot);
+		}
+	});
+}
+
 function loop(inputs) {
+
+	if(inputs.length === 2) {
+		boot();
+		return;
+	}
 
 	var allCommands = _.keys(commands);
 	
