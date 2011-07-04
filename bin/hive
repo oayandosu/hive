@@ -14,7 +14,7 @@ var hive = require('../index'),
  '|_|_|_|\\_/|___|\r\n' +
  '\r\n';
 
-GLOBAL.inflection	= require('../lib/util/inflection');
+GLOBAL.inflection = require('../lib/util/inflection');
 
 // hide logs
 hive.config.debug = false;
@@ -26,12 +26,13 @@ _.templateSettings = {
 };
 
 function genTemplate(file, context, template) {
+	hive.log('Generating template', file, context, template);
 	function render(str) {
 		var result;
 		try {
 			result = _.template(str, context);
 		} catch(e) {
-			console.log('**TEMPLATE ERROR**', e);
+			hive.log('**TEMPLATE ERROR**', e);
 		}
 		return result || str;
 	}
@@ -42,7 +43,7 @@ function genTemplate(file, context, template) {
 			});
 		});
 		template.fetch();
-	} else {
+	} else {	
 		file.update(function(data) {
 			return render(data.toString());
 		});
@@ -50,7 +51,9 @@ function genTemplate(file, context, template) {
 }
 
 function genModel(name) {
-		
+	
+	hive.log('Generating model files for', name);
+	
 	var singular = name;
 	var plural = inflection.pluralize(name);
 	
@@ -113,6 +116,27 @@ function project(name) {
 
 }
 
+var child;
+function boot(callback) {
+	child = spawn('node', ['index.js']);
+	child.stdout.pipe(process.stdout, { end: false });
+	var started = false;
+	child.stdout.on('data', function (data) {
+		if(!started && typeof callback === 'function' && data.toString().indexOf('http://') > -1) {
+			started = true;
+			callback();
+		}
+	});
+	child.on('exit', function (code, signal) {
+		if(signal < 4) {
+			console.log('Hive server shutdown with:', {code: code, signal: signal});
+			process.kill(signal);
+		} else {
+			process.nextTick(boot);
+		}
+	});
+}
+
 function preview(browser) {
 	config(process.env.PWD, function (settings) {
 		// preview in chrome
@@ -158,27 +182,6 @@ var commands = {
 		preview('open');
 	}
 };
-
-var child;
-function boot(callback) {
-	child = spawn('node', ['index.js']);
-	child.stdout.pipe(process.stdout, { end: false });
-	var started = false;
-	child.stdout.on('data', function (data) {
-		if(!started && typeof callback === 'function' && data.toString().indexOf('http://') > -1) {
-			started = true;
-			callback();
-		}
-	});
-	child.on('exit', function (code, signal) {
-		if(signal < 4) {
-			console.log('Hive server shutdown with:', {code: code, signal: signal});
-			process.kill(signal);
-		} else {
-			process.nextTick(boot);
-		}
-	});
-}
 
 function loop(inputs) {
 

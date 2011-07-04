@@ -34,13 +34,11 @@ vows.describe('file').addBatch({
 				var _self = this;
 				file.update(function(data) {
 					return data.replace('hello', 'hey');
-				});
-				file.bind('success', function() {
+				}, function () {
 					var readFile = new hive.File({path: './assets/test.txt'});
-					readFile.bind('success', function() {
+					readFile.fetch(function () {
 						_self.callback(null, readFile.get('data'));
 					});
-					readFile.fetch();
 				});
 			},
 			'it should save the new data to the same file': function(err, data) {

@@ -79,25 +79,8 @@ a, a:active, a:visited { color: #607890; }
 a:hover { color: #036; }
 
 /*
-    // ========================================== \\
-   ||                                              ||
-   ||               Your styles !                  ||
-   ||                                              ||
-    \\ ========================================== //
+	[%= name %] styles:
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }

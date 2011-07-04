@@ -12,4 +12,4 @@ hive
 .post('/new', function(req, res) {
 	var model = new [%= name %](req.body);
 	return model;
-})
+});
