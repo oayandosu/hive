@@ -82,12 +82,13 @@ vows.describe('file').addBatch({
 		'is deleted': {
 			topic: function(dir) {
 				var _self = this;
-				dir.bind('success', function() {
-					fs.lstat(dir.get('path'), function(err, stat) {
-						_self.callback(null, err.message);
+				dir.destroy();
+				dir.ready(function() {
+					fs.lstat(dir.absolute(), function(err, stat) {
+						console.log(dir.absolute(), err, stat);
+						_self.callback(null, stat && stat.message);
 					});
 				});
-				dir.destroy();
 				
 			},
 			

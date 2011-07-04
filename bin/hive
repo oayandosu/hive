@@ -3,6 +3,7 @@
 require('../lib/util/cli');
 
 var hive = require('../index'),
+	config = require('../lib/config'),
 	_ = require('underscore'),
 	options = {},
 	spawn = require('child_process').spawn,
@@ -29,8 +30,9 @@ function genTemplate(file, context, template) {
 		var result;
 		try {
 			result = _.template(str, context);
-		} catch(e) { }
-
+		} catch(e) {
+			console.log('**TEMPLATE ERROR**', e);
+		}
 		return result || str;
 	}
 	if(template) {
@@ -48,7 +50,7 @@ function genTemplate(file, context, template) {
 }
 
 function genModel(name) {
-	
+		
 	var singular = name;
 	var plural = inflection.pluralize(name);
 	
@@ -83,6 +85,7 @@ function genModel(name) {
 		genTemplate(all, context, allTemplate);
 		genTemplate(_new, context, newTemplate);
 	});
+	
 	views.save();
 }
 
@@ -108,6 +111,18 @@ function project(name) {
 		 });
 	});
 
+}
+
+function preview(browser) {
+	config(process.env.PWD, function (settings) {
+		// preview in chrome
+		var url = 'http://' + hive.config.host + ':' + hive.config.port;
+		url = url.replace(':80', '');
+		_.extend(settings, hive.config);
+		boot(function() {
+			spawn(browser, [url]);
+		});
+	});
 }
 
 //Map functionality to args
@@ -139,15 +154,22 @@ var commands = {
 			.write(' model, views, and controller\n\n');
 		}
 	},
-	preview: function () {
-		
+	'-p': function () {
+		preview('open');
 	}
 };
 
 var child;
-function boot() {
+function boot(callback) {
 	child = spawn('node', ['index.js']);
 	child.stdout.pipe(process.stdout, { end: false });
+	var started = false;
+	child.stdout.on('data', function (data) {
+		if(!started && typeof callback === 'function' && data.toString().indexOf('http://') > -1) {
+			started = true;
+			callback();
+		}
+	});
 	child.on('exit', function (code, signal) {
 		if(signal < 4) {
 			console.log('Hive server shutdown with:', {code: code, signal: signal});
