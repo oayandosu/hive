@@ -7,7 +7,7 @@
     "name": "[%= name %]",
     "session": {
       "enabled": true,
-      "secret": "[%= name %]-session-secret"
+      "secret": "[%= guid.new() %]"
     },
     "view": {
       "extension": ".haml",

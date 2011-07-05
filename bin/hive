@@ -6,6 +6,8 @@ var hive = require('../index'),
 	config = require('../lib/config'),
 	_ = require('underscore'),
 	options = {},
+	debug = false,
+	inspector = false,
 	spawn = require('child_process').spawn,
 	hiveART = ''        +
  ' _   _         \r\n'  +
@@ -15,6 +17,7 @@ var hive = require('../index'),
  '\r\n';
 
 GLOBAL.inflection = require('../lib/util/inflection');
+GLOBAL.guid = require('../lib/util/guid');
 
 // hide logs
 hive.config.debug = false;
@@ -118,7 +121,30 @@ function project(name) {
 
 var child;
 function boot(callback) {
-	child = spawn('node', ['index.js']);
+	var args = ['index.js'];
+	if(debug) {
+		args = ['--debug', 'index.js'];
+		if(inspector) {
+			postBoot.push(function() {
+				var nodeInspector = spawn('node-inspector');
+				nodeInspector.stdout.on('data', function(data) {
+					data = data.toString();
+					var url = data.match(/http\S+/g);
+					if(url && url[0]) {
+						spawn('open', [url[0]]);
+					}
+					cli
+					.write('[')
+					.color('cyan')
+					.write('node-inspector')
+					.color('white')
+					.write(']\n\t')
+					.write(data.toString());
+				});
+			});
+		}
+	}
+	child = spawn('node', args);
 	child.stdout.pipe(process.stdout, { end: false });
 	var started = false;
 	child.stdout.on('data', function (data) {
@@ -137,13 +163,14 @@ function boot(callback) {
 	});
 }
 
+var postBoot = [];
 function preview(browser) {
 	config(process.env.PWD, function (settings) {
 		// preview in chrome
 		var url = 'http://' + hive.config.host + ':' + hive.config.port;
 		url = url.replace(':80', '');
 		_.extend(settings, hive.config);
-		boot(function() {
+		postBoot.push(function () {
 			spawn(browser, [url]);
 		});
 	});
@@ -152,6 +179,7 @@ function preview(browser) {
 //Map functionality to args
 var commands = {
 	new: function(args) {
+		options.name = args[args.indexOf('new') + 1];
 		cli
 		.clear()
 		.color('cyan')
@@ -168,6 +196,7 @@ var commands = {
 		}
 	},
 	model: function(args) {
+		options.name = args[args.indexOf('model') + 1];
 		if(options.name) {
 			genModel(options.name);
 			cli.color('white')
@@ -177,34 +206,53 @@ var commands = {
 			.color('white')
 			.write(' model, views, and controller\n\n');
 		}
-	},
-	'-p': function () {
+	}
+};
+var flags = {
+	'-p': function() {
 		preview('open');
+	},
+	'-db': function() {
+		spawn('mongod');
+	},
+	'-debug': function() {
+		debug = true;
+	},
+	'-i': function() {
+		inspector = true;
 	}
 };
 
 function loop(inputs) {
 
-	if(inputs.length === 2) {
-		boot();
-		return;
-	}
-
 	var allCommands = _.keys(commands);
+	var allFlags = _.keys(flags);
+	var commandsRun = 0;
+	var flagsRun = 0;
 	
-	//Find the non command argument (usually the name of the new object)
 	inputs.forEach(function(command) {
-		if(!_.contains(allCommands, command)) {
-			options.name = command;
-		}
-	});
-	
-	//Run all the commands
-	inputs.forEach(function(command) {
+
+		// a command
 		if(_.contains(allCommands, command)) {
 			commands[command](inputs);
-		}
-	});	
+			commandsRun++;
+			
+		// a flag
+		} else if (_.contains(allFlags, command)) {
+			flags[command](inputs);
+			flagsRun++;
+		} 
+		
+	});
+	
+	// if no commands have been run, boot
+	if(!commandsRun) {
+		boot(function() {
+			postBoot.forEach(function (func) {
+				func();
+			});
+		});
+	}
 	
 }
 
