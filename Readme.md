@@ -1,60 +1,52 @@
 # Hive 
+*Version 0.1.1*
 
-Node development on autopilot.   
+_Concise Cloud MVC Framework for **node.js**_
 
-*Version 0.0.1*
+**Great For**
+
+* Single Page Ajax Apps
+* Mobile Web Apps
+* ec2 / Rackspace Cloud / Heroku
+* People who love JavaScript
+* Thin Servers
+* Restful JSON APIs
+* Realtime
+* Geo
+
+**Not Great For**
+
+* SQL
+* Windows
+* State-on-the-Server
+* People who hate JavaScript
+
+## You'll Need
+
+* [mongodb](http://www.mongodb.org/downloads)
+* [node.js](https://sites.google.com/site/nodejsmacosx/)
+* [npm](http://npmjs.org/)
 
 ## Installation
 
-    $ npm install hive
+    npm install hive
 
-## v0.1 Features 
+## Hello World
 
-_note: v0.1 is in development, watch this repo and check back for 0.1 at the top_
+	mkdir -p ~/hive-projects
+	cd ~/hive-projects
+	hive new hello-world
+	cd hello-world
+	hive model Widget
+	hive -p
 
-###Create
+## Tour
 
-	$ hive new hello-world
-	
-###Model
-
-Hive makes modeling data easy. Whether it is in a database, an image, a tweet, or any other piece of data.
-
-    // create a class for reference
-    var User = hive.Model.extend();
-    
-    // create an instance, initializing with some values
-    var ritch = new User({name: 'ritch', password: 'homer'});
-    
-    // models default to sync to mongo, but this can be overriden to sync to any method of persistence
-    ritch.save();
-
-###Controllers
-
-Exposing models over a controller is simple.
-
-    hive
-    .at('/users')
-    .find('/:name', Users)
-    .post('/new', function(req, res) {
-        
-        // create a user
-        var user = new User({name: req.param('name')});
-        
-        // notify the response of anything that happens
-        // this will send errors or any new data on 'success'
-        // or 'error' events in the model
-        user.notify(res).save();
-        
-    });
-
-## Compatibility
-
-Hive is compatible with node 0.4.x
+<iframe width="560" height="349" src="http://www.youtube.com/embed/4YrsIzLZbbs" frameborder="0" allowfullscreen></iframe>
 
 ## License 
 
-(The MIT License)
+**MIT License**
 
 Copyright (c) 2011 Ritchie Martori
 

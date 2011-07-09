@@ -29,14 +29,6 @@ exports = module.exports = hive.Model.extend({
 						assert.true(password.length >= 4);
 					}
 				}
-			},
-			'name': {
-				'a name is required': function(name) {
-					assert.exists(name);
-				},
-				'a name can only be 256 chars in length': function(name) {
-					assert.true(name.length < 256);
-				}
 			}
 		});
 	}
